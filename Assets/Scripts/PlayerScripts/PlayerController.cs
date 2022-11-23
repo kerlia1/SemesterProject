@@ -41,7 +41,8 @@ public class PlayerController : MonoBehaviour
     public void Movement(float move, bool jump)
     {
         targetVelocity = new Vector2(move * 10f, playerBody.velocity.y);
-        playerBody.velocity = Vector3.SmoothDamp(playerBody.velocity, targetVelocity, ref velocity, movementSmoothing);
+        playerBody.velocity = targetVelocity;
+            //Vector3.SmoothDamp(playerBody.velocity, targetVelocity, ref velocity, movementSmoothing);
 
 
         if (isGrounded && jump)

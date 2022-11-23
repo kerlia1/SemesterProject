@@ -11,19 +11,22 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] private PlayerController controller;
 
 
-    void Start()
+    private void Start()
     {
         playerState = GetComponent<PlayerState>();
         controller = GetComponent<PlayerController>();
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * playerState.PlayerSpeed;
-
         if (Input.GetButtonDown("Jump"))
             jump = true;
 
+    }
+
+    private void FixedUpdate()
+    {
+        horizontalMove = Input.GetAxisRaw("Horizontal") * playerState.PlayerSpeed;
 
         controller.Movement(horizontalMove * Time.fixedDeltaTime, jump);
         jump = false;
