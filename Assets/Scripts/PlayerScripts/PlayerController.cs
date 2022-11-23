@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     private bool isGrounded = false;
     private float groundedRadius = .2f;
+    private float movementSmoothing = .1f;
 
     private PlayerState playerState;
     private Rigidbody2D playerBody;
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject groundChecker;
 
     Vector3 targetVelocity = Vector3.zero;
+    Vector3 velocity = Vector3.zero;
 
     private void Awake()
     {
@@ -39,7 +41,7 @@ public class PlayerController : MonoBehaviour
     public void Movement(float move, bool jump)
     {
         targetVelocity = new Vector2(move * 10f, playerBody.velocity.y);
-        playerBody.velocity = targetVelocity;
+        playerBody.velocity = Vector3.SmoothDamp(playerBody.velocity, targetVelocity, ref velocity, movementSmoothing);
 
 
         if (isGrounded && jump)
