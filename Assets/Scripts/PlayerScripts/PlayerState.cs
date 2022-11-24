@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState: MonoBehaviour
+public class PlayerState : MonoBehaviour
 {
 
     private float playerSpeed = 30f;
     public float PlayerSpeed { get => playerSpeed; }
 
-    private float jumpForce = 600f;
-    public float JumpForce { get => jumpForce; }
+    private float playerJumpForce = 600f;
+    public float PlayerJumpForce { get => playerJumpForce; }
 
-    private int healthPoints;
+    private float playerDamage = 5f;
+    public float PlayerDamage { get => playerDamage; }
 
-    public int HealthPoints { get; set; }
+    private int playerHealthPoints;
 
-    private float manaPoints;
+    public int PlayerHealthPoints { get; set; }
 
-    public float ManaPoints { get; set; }
+    private float playerManaPoints;
+
+    public float PlayerManaPoints { get; set; }
 
 }

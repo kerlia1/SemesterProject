@@ -1,20 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerActions : MonoBehaviour
 {
     private float horizontalMove = 0;
     private bool jump = false;
+    private bool attack = false;
     private PlayerState playerState;
 
-    [SerializeField] private PlayerController controller;
+    [SerializeField] private PlayerController playerController;
+
+    [Header("Events")]
+    [Space]
+
+    public UnityEvent OnAttackEvent;
 
 
     private void Start()
     {
         playerState = GetComponent<PlayerState>();
-        controller = GetComponent<PlayerController>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
@@ -22,13 +29,21 @@ public class PlayerActions : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
             jump = true;
 
+        if (Input.GetButtonDown("Attack"))
+            attack = true;
     }
 
     private void FixedUpdate()
     {
         horizontalMove = Input.GetAxisRaw("Horizontal") * playerState.PlayerSpeed;
 
-        controller.Movement(horizontalMove * Time.fixedDeltaTime, jump);
+        playerController.Movement(horizontalMove * Time.fixedDeltaTime, jump);
         jump = false;
+
+        if (attack)
+        {
+            playerController.MeleeCombatAttack();
+            attack = false;
+        }
     }
 }
