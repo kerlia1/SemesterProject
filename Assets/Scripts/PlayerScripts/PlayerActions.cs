@@ -29,7 +29,7 @@ public class PlayerActions : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
             jump = true;
 
-        if (Input.GetButtonDown("Attack"))
+        if (Input.GetKeyDown(KeyCode.Z))
             attack = true;
     }
 

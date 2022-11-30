@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     private float groundedRadius = .2f;
     private float movementSmoothing = .1f;
-    private float attackRadius = .3f;
+    private float attackRange = 1.2f;
 
     private PlayerState playerState;
     private Rigidbody2D playerBody;
@@ -57,15 +57,10 @@ public class PlayerController : MonoBehaviour
     Collider2D[] enemies;
     public void MeleeCombatAttack()
     {
-
-        enemies = Physics2D.OverlapCircleAll(attackPoint.transform.position, attackRadius, WhoIsEnemy);
+        // Get Enemies in AttackRange
+        enemies = Physics2D.OverlapCircleAll(attackPoint.transform.position, attackRange, WhoIsEnemy);
         // play attack animation
         playerAnimator.SetTrigger("playerAttack");
-
-        // Get all enemies in range
-
-
-        // Damage enemies;
     }
 
 }
