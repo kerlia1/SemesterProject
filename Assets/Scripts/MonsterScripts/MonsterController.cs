@@ -4,43 +4,80 @@ using UnityEngine;
 
 public class MonsterController : MonoBehaviour
 {
-    private MonsterState monsterState;
-    private Animator monsterAnimator;
-    private MonsterAIPatrol patrol;
+    [SerializeField] private MonsterState monsterState;
+    [SerializeField] private Rigidbody2D monsterBody;
+    [SerializeField] private LayerMask whatIsGround;
+    [SerializeField] private Transform groundChecker;
+    [SerializeField] private Transform physicMonster;
 
-    // Start is called before the first frame update
-    void Start()
+    private float groundedRadius = 0.45f;
+    [SerializeField] private float localSpeed;
+
+    private void Awake()
     {
         monsterState = GetComponent<MonsterState>();
-        monsterAnimator = GetComponent<Animator>();
-        patrol = GetComponent<MonsterAIPatrol>();
+        monsterBody = GetComponentInChildren<Rigidbody2D>();
+        localSpeed = monsterState.WalkSpeed;
+        //physicMonster = GetComponentInChildren<Transform>();
     }
 
-
+    // Получение урона
     public void GetDamage(int damage)
     {
         if (monsterState.HealthPoints > 0)
         {
-            monsterAnimator.SetTrigger("Hurt");
+            monsterState.ChangeAnimTrigger("Hurt");
             monsterState.HealthPoints -= damage;
         }
         else
         {
-            Die();
+            monsterState.Die();
         }
     }
 
 
-    public void Die()
+
+    private void FixedUpdate()
     {
-        Debug.Log("Enemy Died");
+        NeedTurn();
+        Patrol();
+    }
 
-        // Die animation
-        monsterAnimator.SetTrigger("Die");
 
-        // Disable enemy (delete from scene)
-        GetComponent<Collider2D>().enabled = false;
-        patrol.patrolling = false;
-        GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+    bool mustTurn = false;
+    private bool NeedTurn()
+    {
+        if (monsterState.Alive)
+        {
+            mustTurn = !Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround);
+        }
+        return mustTurn;
+    }
+
+    private void Patrol()
+    {
+        if (monsterState.Alive)
+            monsterBody.velocity = new Vector2(localSpeed * Time.deltaTime, monsterBody.velocity.y);
+
+        if (mustTurn)
+        {
+            Debug.Log(mustTurn);
+            Flip();
+        }
+
+    }
+
+    private void Flip()
+    {
+        transform.localScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
+        localSpeed *= -1;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (groundChecker == null)
+            return;
+
+        Gizmos.DrawWireSphere(groundChecker.transform.position, groundedRadius);
     }
 }

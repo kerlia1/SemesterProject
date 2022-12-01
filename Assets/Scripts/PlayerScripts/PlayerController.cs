@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
 {
     private bool isGrounded = false;
     private float groundedRadius = .2f;
-    private float movementSmoothing = .1f;
     [SerializeField] private float attackRange = 0.69f;
 
     private PlayerState playerState;
@@ -17,6 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask whatIsGround;
     [SerializeField] GameObject groundChecker;
     [SerializeField] GameObject attackPoint;
+    [SerializeField] private MonsterController monsterController;
 
     Vector3 targetVelocity = Vector3.zero;
 
@@ -63,7 +63,14 @@ public class PlayerController : MonoBehaviour
         foreach (var enemy in enemies)
         {
             Debug.Log(enemy.tag);
-            enemy.GetComponent<MonsterController>().GetDamage(playerState.PlayerDamage);
+            if (enemy.tag == "PhysicEnemy")
+            {
+                enemy.GetComponent<MonsterController>().GetDamage(playerState.PlayerDamage);
+            }
+            else
+            {
+                continue;
+            }
         }
 
         // play attack animation

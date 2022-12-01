@@ -5,7 +5,7 @@ using UnityEngine;
 public class MonsterAIPatrol : MonoBehaviour
 {
     public bool patrolling;
-    private float walkSpeed = 250f;
+    private float walkSpeed = 200f;
     private float groundedRadius = .2f;
 
     [SerializeField] private Rigidbody2D monsterBody;
