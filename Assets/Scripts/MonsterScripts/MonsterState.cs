@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MonsterState : MonoBehaviour
 {
-    private MonsterAIPatrol patrol;
     private Animator monsterAnimator;
 
     private int healthPoints = 20;

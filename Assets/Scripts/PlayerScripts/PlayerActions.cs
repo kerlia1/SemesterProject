@@ -22,6 +22,13 @@ public class PlayerActions : MonoBehaviour
 
     public UnityEvent OnAttackEvent;
 
+    //public class BoolEvent: UnityEvent<bool> { }
+
+    private void Awake()
+    {
+        if (OnAttackEvent == null)
+            OnAttackEvent = new UnityEvent();
+    }
 
     private void Start()
     {
@@ -39,6 +46,7 @@ public class PlayerActions : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Z))
             {
                 attack = true;
+                
                 nextAttackTime = Time.time + 1f / attackRate;
             }
         }
@@ -54,7 +62,7 @@ public class PlayerActions : MonoBehaviour
 
         if (attack)
         {
-            playerController.MeleeCombatAttack();
+            OnAttackEvent.Invoke();
             attack = false;
         }
     }
