@@ -8,14 +8,13 @@ public class PlayerState : MonoBehaviour
     private float playerSpeed = 30f;
     public float PlayerSpeed { get => playerSpeed; }
 
-    private float playerJumpForce = 750f;
+    private float playerJumpForce = 350f;
     public float PlayerJumpForce { get => playerJumpForce; }
 
     private int playerDamage = 5;
     public int PlayerDamage { get => playerDamage; }
 
     private int playerHealthPoints;
-
     public int PlayerHealthPoints { get; set; }
 
     private float playerManaPoints;

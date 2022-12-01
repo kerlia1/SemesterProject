@@ -35,23 +35,46 @@ public class PlayerController : MonoBehaviour
         {
             if (item.gameObject != gameObject)
             {
+                playerAnimator.SetBool("Jump", false);
                 isGrounded = true;
             }
         }
     }
 
-
+    bool isFacingRight = true;
     public void Movement(float move, bool jump)
     {
+        if (move > 0 && !isFacingRight)
+        {
+            Flip();
+        }
+        else if (move < 0 && isFacingRight)
+        {
+            Flip();
+        }
+
         targetVelocity = new Vector2(move * 10f, playerBody.velocity.y);
         playerBody.velocity = targetVelocity;
+        playerAnimator.SetFloat("Speed", Mathf.Abs(move));
+
 
         if (isGrounded && jump)
         {
-            //Debug.Log($"isGrounded: {isGrounded}, JumpForce: {playerState.PlayerJumpForce}.");
-            playerBody.AddForce(new Vector2(playerBody.velocity.x, playerState.PlayerJumpForce));
+            playerAnimator.SetBool("Jump", true);
             isGrounded = false;
+            Debug.Log(isGrounded);
+            playerBody.AddForce(new Vector2(playerBody.velocity.x, playerState.PlayerJumpForce));
+            
         }
+    }
+
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 
     Collider2D[] enemies;
@@ -86,6 +109,7 @@ public class PlayerController : MonoBehaviour
             return;
 
         Gizmos.DrawWireSphere(attackPoint.transform.position, attackRange);
+        Gizmos.DrawWireSphere(groundChecker.transform.position, groundedRadius);
     }
 
 }

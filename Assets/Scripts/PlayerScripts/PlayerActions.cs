@@ -22,8 +22,6 @@ public class PlayerActions : MonoBehaviour
 
     public UnityEvent OnAttackEvent;
 
-    //public class BoolEvent: UnityEvent<bool> { }
-
     private void Awake()
     {
         if (OnAttackEvent == null)
@@ -38,15 +36,17 @@ public class PlayerActions : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetKey(KeyCode.Space))
+        {
             jump = true;
+        }
 
         if (Time.time >= nextAttackTime)
         {
             if (Input.GetKeyDown(KeyCode.Z))
             {
                 attack = true;
-                
+
                 nextAttackTime = Time.time + 1f / attackRate;
             }
         }

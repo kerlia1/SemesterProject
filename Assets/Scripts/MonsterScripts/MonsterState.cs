@@ -53,6 +53,14 @@ public class MonsterState : MonoBehaviour
         // Disable enemy (delete from scene)
         GetComponentInChildren<Collider2D>().enabled = false;
         Alive = false;
+        StartCoroutine("DieAnim");
         GetComponentInChildren<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
     }
+
+    IEnumerator DieAnim()
+    {
+        yield return new WaitForSecondsRealtime(1.2f);
+        gameObject.SetActive(false);
+        Debug.Log("Enemy is UnActive");
+    } 
 }
