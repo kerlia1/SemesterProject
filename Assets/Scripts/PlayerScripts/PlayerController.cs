@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     private float groundedRadius = .2f;
     private float movementSmoothing = .1f;
-    private float attackRange = 1.2f;
+    [SerializeField] private float attackRange = 0.69f;
 
     private PlayerState playerState;
     private Rigidbody2D playerBody;
@@ -33,12 +33,12 @@ public class PlayerController : MonoBehaviour
         ground = Physics2D.OverlapCircleAll(groundChecker.transform.position, groundedRadius, whatIsGround);
         foreach (var item in ground)
         {
-            if(item.gameObject != gameObject)
+            if (item.gameObject != gameObject)
             {
                 isGrounded = true;
             }
         }
-    } 
+    }
 
 
     public void Movement(float move, bool jump)
@@ -59,8 +59,26 @@ public class PlayerController : MonoBehaviour
     {
         // Get Enemies in AttackRange
         enemies = Physics2D.OverlapCircleAll(attackPoint.transform.position, attackRange, WhoIsEnemy);
+
+        foreach (var enemy in enemies)
+        {
+            Debug.Log(enemy.tag);
+            enemy.GetComponent<MonsterController>().GetDamage(playerState.PlayerDamage);
+        }
+
         // play attack animation
         playerAnimator.SetTrigger("playerAttack");
+
+        // Damage enemies
+    }
+
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint == null)
+            return;
+
+        Gizmos.DrawWireSphere(attackPoint.transform.position, attackRange);
     }
 
 }

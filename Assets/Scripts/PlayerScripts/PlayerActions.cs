@@ -8,6 +8,11 @@ public class PlayerActions : MonoBehaviour
     private float horizontalMove = 0;
     private bool jump = false;
     private bool attack = false;
+
+    private float attackRate = 2.5f;
+    private float nextAttackTime = 0f;
+
+
     private PlayerState playerState;
 
     [SerializeField] private PlayerController playerController;
@@ -29,8 +34,15 @@ public class PlayerActions : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
             jump = true;
 
-        if (Input.GetKeyDown(KeyCode.Z))
-            attack = true;
+        if (Time.time >= nextAttackTime)
+        {
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                attack = true;
+                nextAttackTime = Time.time + 1f / attackRate;
+            }
+        }
+
     }
 
     private void FixedUpdate()
