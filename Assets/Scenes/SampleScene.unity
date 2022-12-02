@@ -261,12 +261,11 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4565775009461232427, guid: 18ef55af95cca4dfa8efa13334a15d5f, type: 3}
       propertyPath: m_Name
-      value: PhysicMonster
+      value: Monster
       objectReference: {fileID: 0}
     - target: {fileID: 4565775009461232436, guid: 18ef55af95cca4dfa8efa13334a15d5f, type: 3}
       propertyPath: m_RootOrder
@@ -313,14 +312,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 18ef55af95cca4dfa8efa13334a15d5f, type: 3}
 --- !u!1001 &8858601954988696797
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 8858601956540698073, guid: 54f935673d4324edf93094ae69fdf28c, type: 3}
@@ -372,5 +369,4 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 54f935673d4324edf93094ae69fdf28c, type: 3}

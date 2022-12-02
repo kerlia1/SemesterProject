@@ -8,7 +8,6 @@ public class MonsterController : MonoBehaviour
     [SerializeField] private Rigidbody2D monsterBody;
     [SerializeField] private LayerMask whatIsGround;
     [SerializeField] private Transform groundChecker;
-    [SerializeField] private Transform physicMonster;
 
     private float groundedRadius = 0.45f;
     [SerializeField] private float localSpeed;
@@ -18,9 +17,10 @@ public class MonsterController : MonoBehaviour
         monsterState = GetComponent<MonsterState>();
         monsterBody = GetComponentInChildren<Rigidbody2D>();
         localSpeed = monsterState.WalkSpeed;
-        //physicMonster = GetComponentInChildren<Transform>();
     }
 
+    // TODO:
+    // Перенести в Машину состояний
     // Получение урона
     public void GetDamage(int damage)
     {
@@ -35,8 +35,7 @@ public class MonsterController : MonoBehaviour
         }
     }
 
-
-
+    // Считывание состояния монстра сейчас.
     private void FixedUpdate()
     {
         NeedTurn();
@@ -60,19 +59,20 @@ public class MonsterController : MonoBehaviour
             monsterBody.velocity = new Vector2(localSpeed * Time.deltaTime, monsterBody.velocity.y);
 
         if (mustTurn)
-        {
-            Debug.Log(mustTurn);
             Flip();
-        }
+
 
     }
 
+    // Разворот монстра на 180 градусов, изменение скорости
     private void Flip()
     {
         transform.localScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
         localSpeed *= -1;
     }
 
+
+    // Используется для настройки радиуса проверки нахождения на земле.
     private void OnDrawGizmosSelected()
     {
         if (groundChecker == null)
