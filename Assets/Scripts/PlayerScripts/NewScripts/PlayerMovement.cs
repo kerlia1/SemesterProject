@@ -31,12 +31,19 @@ public class PlayerMovement : MonoBehaviour
     private float wallJumpStartTime;
     private int lastWallJumpDir;
 
+    // Dash
+    private int dashesLeft;
+    private bool dasheRefilling;
+    private Vector2 lastDashDir;
+    private bool isDashAttacking;
+
     #endregion
 
     #region Input parameters
     private Vector2 moveInput;
 
     public float LastPressedJumpTime { get; private set; }
+    public float LastPressedDashTime { get; private set; }
     #endregion
 
     #region Check parameters
@@ -65,12 +72,49 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         SetGravityScale(playerState.gravityScale);
+        IsFacingRight = true;
     }
 
+    private void Update()
+    {
+        // Timers
+        LastOnGroundTime -= Time.deltaTime;
+        LastOnWallTime -= Time.deltaTime;
+        LastOnRightTime -= Time.deltaTime;
+        LastOnLeftTime -= Time.deltaTime;
+
+        LastPressedJumpTime -= Time.deltaTime;
+        LastPressedDashTime -= Time.deltaTime;
+
+
+        // Input
+        moveInput.x = Input.GetAxisRaw("Horizontal");
+        moveInput.y = Input.GetAxisRaw("Vertical");
+
+
+    }
+
+    #region General Methods
     private void SetGravityScale(float scale)
     {
         playerBody.gravityScale = scale;
     }
+
+    #endregion
+    
+    private void Turn()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+
+        IsFacingRight = !IsFacingRight;
+    }
+
+
+    // Checkers
+
+
 
     #region Editor
     private void OnDrawGizmosSelected()
