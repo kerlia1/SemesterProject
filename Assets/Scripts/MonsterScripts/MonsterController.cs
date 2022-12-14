@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MonsterController : MonoBehaviour
 {
+    
     [SerializeField] private MonsterState monsterState;
     [SerializeField] private Rigidbody2D monsterBody;
     [SerializeField] private LayerMask whatIsGround;

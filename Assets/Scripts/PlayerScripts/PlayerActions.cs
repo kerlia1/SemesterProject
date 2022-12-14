@@ -10,7 +10,6 @@ public class PlayerActions : MonoBehaviour
 
     private bool isGrounded = false;
     private bool jump = false;
-    private bool attack = false;
 
     private float attackRate = 2.5f;
     private float nextAttackTime = 0f;
@@ -25,7 +24,6 @@ public class PlayerActions : MonoBehaviour
 
     private Rigidbody2D playerBody;
     private PlayerState playerState;
-    private PlayerController playerController;
     private Animator playerAnimator;
 
 
@@ -33,13 +31,13 @@ public class PlayerActions : MonoBehaviour
     {
         playerBody = GetComponent<Rigidbody2D>();
         playerState = GetComponent<PlayerState>();
-        playerController = GetComponent<PlayerController>();
         playerAnimator = GetComponent<Animator>();
+
     }
 
     private void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * playerState.PlayerSpeed;
+        //horizontalMove = Input.GetAxisRaw("Horizontal") * playerState.PlayerSpeed;
         HorizontalMovement(horizontalMove);
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -53,7 +51,9 @@ public class PlayerActions : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Z))
             {
+                Debug.Log("Attacks");
                 MeleeCombatAttack();
+                playerAnimator.SetTrigger("playerAttack");
                 nextAttackTime = Time.time + 1f / attackRate;
             }
         }
@@ -65,26 +65,34 @@ public class PlayerActions : MonoBehaviour
     {
         // Check when grounded
         ground = Physics2D.OverlapCircleAll(groundChecker.transform.position, groundedRadius, whatIsGround);
-        foreach (var item in ground)
+        foreach (Collider2D item in ground)
         {
+            isGrounded = false;
             if (item.gameObject != gameObject)
             {
                 isGrounded = true;
                 OnLanding();
             }
-            else
-            {
-                isGrounded = false;
-            }
         }
 
         if (jump && isGrounded)
         {
-            Debug.Log($"JumpState: {jump} \n GroundState: {isGrounded}");
-            playerBody.AddForce(new Vector2(0, playerState.PlayerJumpForce), ForceMode2D.Impulse);
+            Jump();
             jump = false;
             isGrounded = false;
         }
+    }
+
+    private void Jump()
+    {
+        Debug.Log($"JumpState: {jump} \n GroundState: {isGrounded}");
+
+        // Add force to rigidbody of the player.
+        //playerBody.AddForce(new Vector2(0, playerState.PlayerJumpForce), ForceMode2D.Impulse);
+
+        // Start the animation.
+        playerAnimator.SetBool("Jump", true);
+
     }
 
 
@@ -97,10 +105,10 @@ public class PlayerActions : MonoBehaviour
         {
             Debug.Log(enemy.tag);
 
-            if (enemy.tag == "PhysicEnemy")
-                enemy.GetComponent<MonsterController>().GetDamage(playerState.PlayerDamage);
-            else
+            if (enemy.tag != "PhysicEnemy")
                 continue;
+
+            //enemy.GetComponent<MonsterController>().GetDamage(playerState.PlayerDamage);
 
         }
 
@@ -108,10 +116,6 @@ public class PlayerActions : MonoBehaviour
 
     bool isFacingRight = true;
 
-    /// <summary>
-    /// HorizontalMovement
-    /// </summary>
-    /// <param name="move"></param>
     public void HorizontalMovement(float move)
     {
         // Change direction of the Player
@@ -123,6 +127,9 @@ public class PlayerActions : MonoBehaviour
         {
             Flip();
         }
+
+        // Start animation of the player:
+        playerAnimator.SetFloat("Speed", Mathf.Abs(move));
 
         // Movement [<-] [->]
         targetVelocity = new Vector2(move, playerBody.velocity.y);
@@ -140,7 +147,6 @@ public class PlayerActions : MonoBehaviour
 
     public void OnLanding()
     {
-        //Debug.Log("Player landed");
         playerAnimator.SetBool("Jump", false);
     }
 

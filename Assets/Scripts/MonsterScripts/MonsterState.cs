@@ -15,18 +15,6 @@ public class MonsterState : MonoBehaviour
     private bool alive;
     public bool Alive { get => alive; set { alive = value; } }
 
-    
-    
-
-
-
-
-
-
-
-
-
-
     private void Start()
     {
         alive = true;
