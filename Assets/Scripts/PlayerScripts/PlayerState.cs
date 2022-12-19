@@ -8,8 +8,8 @@ public class PlayerState : ScriptableObject
     #region Gravity
     // Gravity params
     [Header("Gravity")]
-    [HideInInspector] public float gravityStrength;
-    [HideInInspector] public float gravityScale;
+    public float gravityStrength;
+    [Range (1f, 2f)] public float gravityScale;
 
     [Space(5)]
     public float fallGravityMult;
@@ -26,9 +26,9 @@ public class PlayerState : ScriptableObject
     [Header("Run")]
     public float runMaxSpeed;
     public float runAcceleration;
-    [HideInInspector] public float runAccelAmount;
+    public float runAccelAmount;
     public float runDecceleration;
-    [HideInInspector] public float runDeccelAmount;
+    public float runDeccelAmount;
     [Space(5)]
     [Range(0f, 1f)] public float accelInAir;
     [Range(0f, 1f)] public float deccelInAir;
@@ -41,10 +41,10 @@ public class PlayerState : ScriptableObject
     [Header("Jump")]
     public float jumpHeight;
     public float jumpTimeToApex;
-    [HideInInspector] public float jumpForce;
+    public float jumpForce;
 
     [Header("Both Jumps")]
-    public float jumpCutGravityMult; // Multiplier to increase gravity if the player releases jump button when he still jumping;
+    public float jumpCutGravityMult; // Множитель скорости, который срабатывает, если во время прыжка игрок продолжает держаться кнопку прыжка
     [Range(0f, 1f)] public float jumpHangGravityMult; // Reduces the gravity when player close to apex of jump height;
     public float jumpTimeThershold; // Скорости при которых игрок будет использовать дополнительно зависание в прыжке (скорость игрока ближе всего к вершине прыжка)
     [Space(5)]
@@ -69,6 +69,10 @@ public class PlayerState : ScriptableObject
     public float slideAccel;
     #endregion
     [Space(15)]
+
+    [Header("Assists")]
+    [Range(0.01f, 0.5f)] public float coyoteTime;
+    [Range(0.01f, 0.5f)] public float jumpInputBufferTime;
 
     #region Dash
     [Header("Dash")]
@@ -98,7 +102,7 @@ public class PlayerState : ScriptableObject
         gravityStrength = -(2 * jumpHeight) / (jumpTimeToApex * jumpTimeToApex);
 
         // GravityScale in curr project
-        gravityScale = gravityScale / Physics2D.gravity.y;
+        gravityScale = gravityStrength / Physics2D.gravity.y;
 
         // Amount = ((1 / Time.fixedDeltaTime) * acceleration) / runMaxSpeed
         // 50 - const for cur project

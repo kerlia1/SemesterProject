@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
 
     #region Components
     public Rigidbody2D playerBody { get; private set; }
+
+    public PlayerAnimator animHandler { get; private set; }
     #endregion
 
     #region State Parameters
@@ -67,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         playerBody = GetComponent<Rigidbody2D>();
+        animHandler = GetComponent<PlayerAnimator>();
     }
 
     private void Start()
@@ -91,27 +94,312 @@ public class PlayerMovement : MonoBehaviour
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
 
+        if (moveInput.x != 0)
+            CheckFaceDirection(moveInput.x > 0);
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnJumpInput();
+        }
+
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            OnJumpUpInput();
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            OnDashInput();
+        }
+
+
+        if (!IsDashing && !IsJumping)
+        {
+            //Ground Check
+            if (Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0, whatIsGround) && !IsJumping)
+            {
+                if (LastOnGroundTime < -0.2f)
+                {
+                    Debug.Log("Player Landed");
+                    animHandler.justLanded = true;
+                }
+
+                LastOnGroundTime = playerState.coyoteTime;
+            }
+
+            //Right Wall Check
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && IsFacingRight)
+                    || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)) && !IsWallJumping)
+                LastOnRightTime = playerState.coyoteTime;
+
+            //Right Wall Check
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)
+                || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && IsFacingRight)) && !IsWallJumping)
+                LastOnLeftTime = playerState.coyoteTime;
+
+
+            LastOnWallTime = Mathf.Max(LastOnLeftTime, LastOnRightTime);
+        }
+
+        // Jump checks
+        if (IsJumping && playerBody.velocity.y < 0)
+        {
+            IsJumping = false;
+
+            if (!IsWallJumping)
+                isJumpFalling = true;
+        }
+
+        if (IsWallJumping && Time.time - wallJumpStartTime > playerState.wallJumpTime)
+        {
+            IsWallJumping = false;
+        }
+
+        if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
+        {
+            isJumpCut = false;
+
+            if (!IsJumping)
+                isJumpFalling = false;
+        }
+
+        if (!IsDashing)
+        {
+            // Jump
+            if (canJump() && LastPressedJumpTime > 0)
+            {
+                IsJumping = true;
+                IsWallJumping = false;
+                isJumpCut = false;
+                isJumpFalling = false;
+                Jump();
+
+                animHandler.startedJumping = true;
+            }
+
+            // Wall jump
+            else if (canWallJump() && LastPressedJumpTime > 0)
+            {
+                IsWallJumping = true;
+                IsJumping = false;
+                isJumpCut = false;
+                isJumpFalling = false;
+
+                wallJumpStartTime = Time.time;
+                lastWallJumpDir = (LastOnRightTime > 0) ? -1 : 1;
+
+                WallJump(lastWallJumpDir);
+            }
+        }
+
+        // Dash checks
+        if (canDash() && LastPressedDashTime > 0)
+        {
+
+            Sleep(playerState.dashSleepTime);
+
+            if (moveInput != Vector2.zero)
+                lastDashDir = moveInput;
+            else
+                lastDashDir = IsFacingRight ? Vector2.right : Vector2.left;
+
+
+
+            IsDashing = true;
+            IsJumping = false;
+            IsWallJumping = false;
+            isJumpCut = false;
+
+            StartCoroutine(nameof(StartDash), lastDashDir);
+        }
+
+        // Slide checks
+        if (CanSlide() && ((LastOnLeftTime > 0 && moveInput.x < 0) || (LastOnRightTime > 0 && moveInput.x > 0)))
+            IsSliding = true;
+        else
+            IsSliding = false;
+
+
+        // Gravity
+        if (!isDashAttacking)
+        {
+
+            if (IsSliding)
+            {
+                SetGravityScale(0);
+            }
+            else if (playerBody.velocity.y < 0 && moveInput.y < 0)
+            {
+
+                SetGravityScale(playerState.gravityScale * playerState.fastFallGravityMult);
+
+                playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -playerState.maxFastFallSpeed));
+            }
+            else if (isJumpCut)
+            {
+
+                SetGravityScale(playerState.gravityScale * playerState.jumpCutGravityMult);
+                playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -playerState.maxFallSpeed));
+            }
+            else if ((IsJumping || IsWallJumping || isJumpFalling) && Mathf.Abs(playerBody.velocity.y) < playerState.jumpTimeThershold)
+            {
+                SetGravityScale(playerState.gravityScale * playerState.jumpHangGravityMult);
+            }
+            else if (playerBody.velocity.y < 0)
+            {
+
+                SetGravityScale(playerState.gravityScale * playerState.fallGravityMult);
+
+                playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -playerState.maxFallSpeed));
+            }
+            else
+            {
+
+                SetGravityScale(playerState.gravityScale);
+            }
+        }
+        else
+        {
+
+            SetGravityScale(0);
+        }
     }
 
     private void FixedUpdate()
     {
-        if(!IsDashing)
+        if (!IsDashing)
         {
             if (IsWallJumping)
                 Run(playerState.wallJumpRunLerp);
             else
                 Run(1);
         }
+        else if (isDashAttacking)
+        {
+            Run(playerState.dashEndRunLerp);
+        }
+
+        if (IsSliding)
+            Slide();
     }
+
+    public void OnJumpInput()
+    {
+        LastPressedJumpTime = playerState.jumpInputBufferTime;
+    }
+
+    public void OnJumpUpInput()
+    {
+        if (canJumpCut() || canWallJumpCut())
+            isJumpCut = true;
+    }
+
+    public void OnDashInput()
+    {
+        LastPressedDashTime = playerState.dashInputBufferTime;
+    }
+
+
 
     #region General Methods
     private void SetGravityScale(float scale)
     {
         playerBody.gravityScale = scale;
     }
+    private void Sleep(float duration)
+    {
+        //Method used so we don't need to call StartCoroutine everywhere
+        //nameof() notation means we don't need to input a string directly.
+        //Removes chance of spelling mistakes and will improve error messages if any
+        StartCoroutine(nameof(PerformSleep), duration);
+    }
+
+    private IEnumerator PerformSleep(float duration)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1;
+    }
 
     #endregion
+
+
+
+    // Jump
+    private void Jump()
+    {
+        LastPressedJumpTime = 0;
+        LastOnGroundTime = 0;
+
+        float force = playerState.jumpForce;
+        if (playerBody.velocity.y < 0)
+            force -= playerBody.velocity.y;
+
+        playerBody.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+    }
+
+    private void WallJump(int dir)
+    {
+        LastPressedJumpTime = 0;
+        LastOnGroundTime = 0;
+        LastOnRightTime = 0;
+        LastOnLeftTime = 0;
+
+
+        Vector2 force = new Vector2(playerState.wallJumpForce.x, playerState.wallJumpForce.y);
+        force.x *= dir;
+
+        if (Mathf.Sign(playerBody.velocity.x) != Mathf.Sign(force.x))
+            force.x -= playerBody.velocity.x;
+
+        if (playerBody.velocity.y < 0)
+            force.y -= playerBody.velocity.y;
+
+        playerBody.AddForce(force, ForceMode2D.Impulse);
+
+    }
+
+    private IEnumerator StartDash(Vector2 dir)
+    {
+        LastOnGroundTime = 0;
+        LastPressedDashTime = 0;
+
+        float startTime = Time.time;
+
+        dashesLeft--;
+        isDashAttacking = true;
+
+        SetGravityScale(0);
+
+        while (Time.time - startTime <= playerState.dashAttackTime)
+        {
+            playerBody.velocity = dir.normalized * playerState.dashSpeed;
+            yield return null;
+        }
+
+        startTime = Time.time;
+
+        isDashAttacking = false;
+        SetGravityScale(playerState.gravityScale);
+        playerBody.velocity = playerState.dashEndSpeed * dir.normalized;
+
+        while (Time.time - startTime <= playerState.dashEndTime)
+        {
+            yield return null;
+        }
+
+        // Рывок закончен
+        IsDashing = false;
+    }
+
+    private IEnumerator RefillDash(int amount)
+    {
+        dasheRefilling = true;
+        yield return new WaitForSeconds(playerState.dashRefillTime);
+        dasheRefilling = false;
+        dashesLeft = Mathf.Min(playerState.dashAmount, dashesLeft + 1);
+    }
+
 
 
     private void Run(float lerpAmount)
@@ -127,30 +415,17 @@ public class PlayerMovement : MonoBehaviour
         else
             accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? playerState.runAccelAmount * playerState.accelInAir : playerState.runDeccelAmount * playerState.deccelInAir;
 
-        #region Add Bonus Jump Apex Acceleration
-        //Increase are acceleration and maxSpeed when at the apex of their jump, makes the jump feel a bit more bouncy, responsive and natural
+
         if ((IsJumping || IsWallJumping || isJumpFalling) && Mathf.Abs(playerBody.velocity.y) < playerState.jumpTimeThershold)
-  {
+        {
             accelRate *= playerState.jumpHangAccelMult;
             targetSpeed *= playerState.jumpHangMaxSpeedMult;
         }
-        #endregion
 
-        #region Conserve Momentum
-        
-        if (playerState.doConserveMomentum && Mathf.Abs(playerBody.velocity.x) > Mathf.Abs(targetSpeed) && Mathf.Sign(playerBody.velocity.x) == Mathf.Sign(targetSpeed) && Mathf.Abs(targetSpeed) > 0.01f && LastOnGroundTime < 0)
-        {
-            accelRate = 0;
-        }
-        #endregion
-        // Difference between current and desired velocity
         float speedDif = targetSpeed - playerBody.velocity.x;
         float movement = speedDif * accelRate;
 
         playerBody.AddForce(movement * Vector2.right, ForceMode2D.Force);
-
-
-
     }
 
     private void Turn()
@@ -163,20 +438,15 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    // Dash Methods
-    private IEnumerator StartDash(Vector2 dir)
+    private void Slide()
     {
-        yield return null;
-    }
-    
-    private IEnumerator RefilDash()
-    {
-        dasheRefilling = true;
-        yield return new WaitForSeconds(playerState.dashRefillTime);
-        dasheRefilling = false;
-        dashesLeft = Mathf.Min(playerState.dashAmount, dashesLeft + 1);
+        float speedDif = playerState.slideSpeed - playerBody.velocity.y;
+        float movement = speedDif * playerState.slideAccel;
+        movement = Mathf.Clamp(movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
+        playerBody.AddForce(movement * Vector2.up);
     }
 
+    #region Check Methods
     // Checkers
     public void CheckFaceDirection(bool isMovingRight)
     {
@@ -208,8 +478,8 @@ public class PlayerMovement : MonoBehaviour
     private bool canDash()
     {
         if (!IsDashing && dashesLeft < playerState.dashAmount && LastOnGroundTime > 0 && !dasheRefilling)
-            StartCoroutine(nameof(RefilDash), 1);
-        
+            StartCoroutine(nameof(RefillDash), 1);
+
         return dashesLeft > 0;
     }
 
@@ -220,6 +490,8 @@ public class PlayerMovement : MonoBehaviour
 
         return false;
     }
+    #endregion
+
 
     #region Editor
     private void OnDrawGizmosSelected()

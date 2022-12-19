@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: IceSpirit
   m_EditorClassIdentifier: 
   gravityStrength: -52
-  gravityScale: -0
+  gravityScale: 1.7333333
   fallGravityMult: 2
   maxFallSpeed: 18
   fastFallGravityMult: 1
-  maxFastFallSpeed: 200
+  maxFastFallSpeed: 20
   runMaxSpeed: 9.5
   runAcceleration: 9.5
   runAccelAmount: 50
@@ -34,18 +34,20 @@ MonoBehaviour:
   jumpTimeThershold: 0
   jumpHangAccelMult: 1
   jumpHangMaxSpeedMult: 1
-  wallJumpForce: {x: 10, y: 20}
+  wallJumpForce: {x: 8.5, y: 20}
   wallJumpRunLerp: 0.075
   wallJumpTime: 0.3
   doTurnOnWallJump: 0
-  slideSpeed: -10
-  slideAccel: 10
-  dashAmount: 0
-  dashSpeed: 0
-  dashSleepTime: 0
-  dashAttackTime: 0
-  dashEndTime: 0
-  dashEndSpeed: {x: 0, y: 0}
-  dashEndRunLerp: 0
-  dashRefillTime: 0
-  dashInputBufferTime: 0
+  slideSpeed: -12
+  slideAccel: 12
+  coyoteTime: 0.2
+  jumpInputBufferTime: 0.2
+  dashAmount: 1
+  dashSpeed: 40
+  dashSleepTime: 0.07
+  dashAttackTime: 0.2
+  dashEndTime: 0.2
+  dashEndSpeed: {x: 15, y: 0}
+  dashEndRunLerp: 0.5
+  dashRefillTime: 0.075
+  dashInputBufferTime: 0.1
