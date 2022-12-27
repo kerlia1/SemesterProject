@@ -44,11 +44,14 @@ public class MonsterController : MonoBehaviour
     }
 
 
-    bool mustTurn = false;
+    public bool mustTurn = false;
+    Collider2D ground;
     private bool NeedTurn()
     {
         if (monsterState.Alive)
         {
+            Debug.Log($"Must turn: {mustTurn}, Cur dir right: {!Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround)}");
+
             mustTurn = !Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround);
         }
         return mustTurn;

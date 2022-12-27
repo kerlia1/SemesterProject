@@ -122,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Debug.Log("Player Landed");
                     animHandler.justLanded = true;
+                    animHandler.wallSliding = false;
                 }
 
                 LastOnGroundTime = playerState.coyoteTime;
@@ -131,6 +132,7 @@ public class PlayerMovement : MonoBehaviour
             if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && IsFacingRight)
                     || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)) && !IsWallJumping)
                 LastOnRightTime = playerState.coyoteTime;
+           
 
             //Right Wall Check
             if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)
@@ -172,6 +174,7 @@ public class PlayerMovement : MonoBehaviour
                 IsWallJumping = false;
                 isJumpCut = false;
                 isJumpFalling = false;
+                IsSliding = false;
                 Jump();
 
                 animHandler.startedJumping = true;
@@ -215,10 +218,15 @@ public class PlayerMovement : MonoBehaviour
 
         // Slide checks
         if (CanSlide() && ((LastOnLeftTime > 0 && moveInput.x < 0) || (LastOnRightTime > 0 && moveInput.x > 0)))
+        {
             IsSliding = true;
+            //animHandler.wallSliding = IsSliding;
+        }
         else
+        {
             IsSliding = false;
-
+            //animHandler.wallSliding = IsSliding;
+        }
 
         // Gravity
         if (!isDashAttacking)
@@ -308,9 +316,6 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Sleep(float duration)
     {
-        //Method used so we don't need to call StartCoroutine everywhere
-        //nameof() notation means we don't need to input a string directly.
-        //Removes chance of spelling mistakes and will improve error messages if any
         StartCoroutine(nameof(PerformSleep), duration);
     }
 
@@ -323,9 +328,7 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
 
-
-
-    // Jump
+    #region Jump Methods
     private void Jump()
     {
         LastPressedJumpTime = 0;
@@ -338,13 +341,14 @@ public class PlayerMovement : MonoBehaviour
         playerBody.AddForce(Vector2.up * force, ForceMode2D.Impulse);
     }
 
+    
+
     private void WallJump(int dir)
     {
         LastPressedJumpTime = 0;
         LastOnGroundTime = 0;
         LastOnRightTime = 0;
         LastOnLeftTime = 0;
-
 
         Vector2 force = new Vector2(playerState.wallJumpForce.x, playerState.wallJumpForce.y);
         force.x *= dir;
@@ -359,6 +363,9 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    #endregion
+
+    #region Dash Methods
     private IEnumerator StartDash(Vector2 dir)
     {
         LastOnGroundTime = 0;
@@ -400,6 +407,7 @@ public class PlayerMovement : MonoBehaviour
         dashesLeft = Mathf.Min(playerState.dashAmount, dashesLeft + 1);
     }
 
+    #endregion
 
 
     private void Run(float lerpAmount)
@@ -438,11 +446,21 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    // Если мы прыгаем на стену, то разворачиваемся и начинаем соскальзывать
     private void Slide()
     {
+        // Разворачиваемся, когда запускается slide
+        Turn();
+
+        // Разница в скорости
         float speedDif = playerState.slideSpeed - playerBody.velocity.y;
+
+        // Текущая скорость передвижения
         float movement = speedDif * playerState.slideAccel;
         movement = Mathf.Clamp(movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
+        
+        
+        
         playerBody.AddForce(movement * Vector2.up);
     }
 

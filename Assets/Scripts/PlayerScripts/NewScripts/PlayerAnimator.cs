@@ -11,9 +11,9 @@ public class PlayerAnimator : MonoBehaviour
 
     public bool startedJumping { private get; set; }
     public bool justLanded { private get; set; }
+    public bool wallSliding { private get; set; }
 
     public float currentVelY;
-
     public float currentVelX;
 
     void Start()
@@ -32,6 +32,12 @@ public class PlayerAnimator : MonoBehaviour
     {
         anim.SetFloat("velY", mov.playerBody.velocity.y);
         anim.SetFloat("velX", Mathf.Abs(mov.playerBody.velocity.x));
+
+        if (wallSliding)
+        {
+            anim.SetBool("WallSlide", true);
+            return;
+        }
     }
 
     private void CheckAnimationState()
@@ -49,6 +55,8 @@ public class PlayerAnimator : MonoBehaviour
             justLanded = false;
             return;
         }
+
+        
 
         
     }
