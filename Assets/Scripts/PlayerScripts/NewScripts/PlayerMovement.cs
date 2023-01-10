@@ -12,28 +12,28 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region State Parameters
-    // Parameters to control player actions
+    // Параметры, чтобы контролировать действия игрока
     public bool IsFacingRight { get; private set; }
     public bool IsJumping { get; private set; }
     public bool IsWallJumping { get; private set; }
     public bool IsDashing { get; private set; }
     public bool IsSliding { get; private set; }
 
-    // Timers
+    // Таймеры
     public float LastOnGroundTime { get; private set; }
     public float LastOnWallTime { get; private set; }
     public float LastOnRightTime { get; private set; }
     public float LastOnLeftTime { get; private set; }
 
-    // Jump
+    // Прыжок
     private bool isJumpCut;
     private bool isJumpFalling;
 
-    // Wall Jump
+    // Прыжок от стены
     private float wallJumpStartTime;
     private int lastWallJumpDir;
 
-    // Dash
+    // Дэш
     private int dashesLeft;
     private bool dasheRefilling;
     private Vector2 lastDashDir;
@@ -109,6 +109,11 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X))
         {
             OnDashInput();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Respawn();
         }
 
 
@@ -460,6 +465,13 @@ public class PlayerMovement : MonoBehaviour
         
         
         playerBody.AddForce(movement * Vector2.up);
+    }
+
+    private void Respawn()
+    {
+        Vector2 respawnPos = new Vector2(-6.5f, -7.5f);
+
+        gameObject.transform.position = respawnPos;
     }
 
     #region Check Methods
