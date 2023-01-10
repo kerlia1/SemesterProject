@@ -288,7 +288,7 @@ GameObject:
   m_Layer: 7
   m_Name: AttackPoint
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -460,7 +460,7 @@ Transform:
   - {fileID: 9087670884168002812}
   - {fileID: 9087670884664916037}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &9087670884701122134
 BoxCollider2D:
@@ -561,6 +561,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   attackPoint: {fileID: 9087670884537557324}
+  playerState: {fileID: 11400000, guid: f4f40d643214f51468b2f79845a6d929, type: 2}
   swordAnimator: {fileID: 9087670883133490578}
 --- !u!1 &9087670884955923556
 GameObject:

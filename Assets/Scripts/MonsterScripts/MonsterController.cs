@@ -50,7 +50,7 @@ public class MonsterController : MonoBehaviour
     {
         if (monsterState.Alive)
         {
-            Debug.Log($"Must turn: {mustTurn}, Cur dir right: {!Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround)}");
+            //Debug.Log($"Must turn: {mustTurn}, Cur dir right: {!Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround)}");
 
             mustTurn = !Physics2D.OverlapCircle(groundChecker.transform.position, groundedRadius, whatIsGround);
         }

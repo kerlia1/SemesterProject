@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c82d89da82f48ef9a8ef74e201c89f, type: 3}
   m_Name: IceSpirit
   m_EditorClassIdentifier: 
+  playerDamage: 5
   gravityStrength: -52
   gravityScale: 1.7333333
   fallGravityMult: 2

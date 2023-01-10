@@ -5,11 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "PlayerState")] // Create a new PlayerState
 public class PlayerState : ScriptableObject
 {
+    [Header("Damage")]
+
+    public int playerDamage;
+    [Space(5)]
+
     #region Gravity
     // Gravity params
     [Header("Gravity")]
     public float gravityStrength;
-    [Range (1f, 2f)] public float gravityScale;
+    [Range(1f, 2f)] public float gravityScale;
 
     [Space(5)]
     public float fallGravityMult;

@@ -49,12 +49,12 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region Check parameters
-    // Setings for Inspector
+
     [Header("Checks")]
     [SerializeField] private Transform groundCheckPoint;
     [SerializeField] private Vector2 groundCheckSize = new Vector2(.5f, .03f);
     [Space(5)]
-    // Walls
+
     [SerializeField] private Transform frontWallCheckPoint;
     [SerializeField] private Transform backWallCheckPoint;
     [SerializeField] private Vector2 wallCheckSize = new Vector2(.35f, 1f);
@@ -80,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        // Timers
+        // Таймеры
         LastOnGroundTime -= Time.deltaTime;
         LastOnWallTime -= Time.deltaTime;
         LastOnRightTime -= Time.deltaTime;
@@ -89,8 +89,7 @@ public class PlayerMovement : MonoBehaviour
         LastPressedJumpTime -= Time.deltaTime;
         LastPressedDashTime -= Time.deltaTime;
 
-
-        // Input
+        // Ввод
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
 
@@ -115,12 +114,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (!IsDashing && !IsJumping)
         {
-            //Ground Check
+            // Проверка приземления
             if (Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0, whatIsGround) && !IsJumping)
             {
                 if (LastOnGroundTime < -0.2f)
                 {
-                    Debug.Log("Player Landed");
                     animHandler.justLanded = true;
                     animHandler.wallSliding = false;
                 }
@@ -128,13 +126,12 @@ public class PlayerMovement : MonoBehaviour
                 LastOnGroundTime = playerState.coyoteTime;
             }
 
-            //Right Wall Check
+            // Проверка стены справа
             if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && IsFacingRight)
                     || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)) && !IsWallJumping)
                 LastOnRightTime = playerState.coyoteTime;
            
-
-            //Right Wall Check
+            // Проверка стены слева
             if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && !IsFacingRight)
                 || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, whatIsGround) && IsFacingRight)) && !IsWallJumping)
                 LastOnLeftTime = playerState.coyoteTime;
@@ -143,7 +140,7 @@ public class PlayerMovement : MonoBehaviour
             LastOnWallTime = Mathf.Max(LastOnLeftTime, LastOnRightTime);
         }
 
-        // Jump checks
+        // Чекеры прыжков
         if (IsJumping && playerBody.velocity.y < 0)
         {
             IsJumping = false;
@@ -167,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (!IsDashing)
         {
-            // Jump
+            // Прыжок
             if (canJump() && LastPressedJumpTime > 0)
             {
                 IsJumping = true;
@@ -180,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
                 animHandler.startedJumping = true;
             }
 
-            // Wall jump
+            // Прыжок от стены
             else if (canWallJump() && LastPressedJumpTime > 0)
             {
                 IsWallJumping = true;
@@ -195,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // Dash checks
+        // Чекеры для дэша
         if (canDash() && LastPressedDashTime > 0)
         {
 
@@ -216,7 +213,8 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(nameof(StartDash), lastDashDir);
         }
 
-        // Slide checks
+        // Слайдинг по стене
+        // Не настроены анимации
         if (CanSlide() && ((LastOnLeftTime > 0 && moveInput.x < 0) || (LastOnRightTime > 0 && moveInput.x > 0)))
         {
             IsSliding = true;
@@ -228,7 +226,7 @@ public class PlayerMovement : MonoBehaviour
             //animHandler.wallSliding = IsSliding;
         }
 
-        // Gravity
+        // Гравитация
         if (!isDashAttacking)
         {
 
@@ -416,7 +414,7 @@ public class PlayerMovement : MonoBehaviour
 
         targetSpeed = Mathf.Lerp(playerBody.velocity.x, targetSpeed, lerpAmount);
 
-        // Acceleration.
+        // Скорость
         float accelRate;
         if (LastOnGroundTime > 0)
             accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? playerState.runAccelAmount : playerState.runDeccelAmount;
@@ -465,7 +463,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #region Check Methods
-    // Checkers
     public void CheckFaceDirection(bool isMovingRight)
     {
         if (isMovingRight != IsFacingRight)
